@@ -1,0 +1,60 @@
+
+===
+1. Normal run with a transient failure recovered on retry
+===
+  - trigger: scheduled run started
+  - pull: 5 entries from source
+  - map: 4 approved rows after field mapping
+  - write to Excel table: attempt 1 failed (transient connector timeout); retrying
+  - wrote table: 4 new rows, 4 total (0 duplicates skipped)
+  - write to Excel table: succeeded on attempt 2
+  - notify: success notification sent
+summary: {'added': 4, 'total': 4, 'skipped': 0, 'dlq_count': 0}
+
+===
+2. Idempotent re-run (same source, table already populated)
+===
+  - trigger: scheduled run started
+  - pull: 5 entries from source
+  - map: 4 approved rows after field mapping
+  - wrote table: 0 new rows, 4 total (4 duplicates skipped)
+  - notify: success notification sent
+summary: {'added': 0, 'total': 4, 'skipped': 4, 'dlq_count': 0}
+
+===
+3. Dry-run: every step logged, no files touched
+===
+  - trigger: scheduled run started [DRY RUN]
+  - pull: 5 entries from source
+  - map: 4 approved rows after field mapping
+  - [DRY RUN] wrote table: 4 new rows, 4 total (0 duplicates skipped)
+  - notify: success notification sent
+summary: {'added': 4, 'total': 4, 'skipped': 0, 'dlq_count': 0}
+table exists after dry-run: False
+
+===
+4. Permanent failure: bad row goes to DLQ, run still succeeds
+===
+  - trigger: scheduled run started
+  - pull: 5 entries from source
+  - map: 4 approved rows after field mapping
+  - wrote table: 3 new rows, 3 total (0 duplicates skipped)
+  - dlq: recorded 1 failed row(s) for review (1 total in DLQ)
+  - notify: success notification sent
+summary: {'added': 3, 'total': 3, 'skipped': 0, 'dlq_count': 1}
+DLQ contents:
+[
+  {
+    "row": {
+      "EntryId": "t1",
+      "Employee": "Alex Kim",
+      "Date": "2026-06-22",
+      "Project": "Onboarding",
+      "Hours": 6.5,
+      "CostCenter": "CC-100",
+      "Approved": true
+    },
+    "reason": "permanent: connector rejected row",
+    "timestamp": "2026-06-27T22:46:01.020591+00:00"
+  }
+]

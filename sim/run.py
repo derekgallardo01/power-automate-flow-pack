@@ -1,4 +1,4 @@
-"""Demo the scheduled-sync flow: pull → map → write (with retry) → log.
+"""Demo the scheduled-sync flow: pull -> map -> write (with retry) -> log.
 
 Run twice to see idempotency: the second run adds 0 rows (all deduped).
 """
@@ -16,9 +16,12 @@ from flow import run_sync  # noqa: E402
 def main() -> int:
     here = os.path.dirname(os.path.abspath(__file__))
     data = os.path.join(here, "data")
-    table = os.path.join(here, "out", "excel_table.json")
-    if os.path.exists(table):
-        os.remove(table)
+    out = os.path.join(here, "out")
+    table = os.path.join(out, "excel_table.json")
+    dlq = os.path.join(out, "dlq.json")
+    for path in (table, dlq):
+        if os.path.exists(path):
+            os.remove(path)
 
     print("=== Run 1 (with a simulated transient failure) ===")
     log, result = run_sync(
@@ -29,7 +32,7 @@ def main() -> int:
     print(log)
     print(f"result: {result}")
 
-    print("\n=== Run 2 (idempotent — nothing new) ===")
+    print("\n=== Run 2 (idempotent -- nothing new) ===")
     log2, result2 = run_sync(
         os.path.join(data, "asana_export.json"),
         os.path.join(data, "mapping-config.json"),

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "clean-run",
+    "scenario": {"description": "First run, no failures, all four approved rows land in the table."},
+    "expect": {"added": 4, "total": 4, "skipped": 0, "dlq_count": 0, "log_contains": ["pull: 5 entries", "map: 4 approved rows", "wrote table: 4 new rows"]}
+  },
+  {
+    "id": "transient-recovered",
+    "scenario": {"description": "First write fails (simulated timeout), second attempt succeeds."},
+    "expect": {"added": 4, "total": 4, "skipped": 0, "dlq_count": 0, "log_contains": ["attempt 1 failed", "succeeded on attempt 2", "wrote table: 4 new rows"]}
+  },
+  {
+    "id": "transient-recovered-on-third",
+    "scenario": {"description": "Two transient failures, succeeds on third attempt."},
+    "expect": {"added": 4, "total": 4, "skipped": 0, "dlq_count": 0, "log_contains": ["attempt 1 failed", "attempt 2 failed", "succeeded on attempt 3"]}
+  },
+  {
+    "id": "idempotent-rerun",
+    "scenario": {"description": "Re-run against an already-populated table; nothing new written.", "seed_run": true},
+    "expect": {"added": 0, "total": 4, "skipped": 4, "dlq_count": 0, "log_contains": ["wrote table: 0 new rows", "4 duplicates skipped"]}
+  },
+  {
+    "id": "partial-dedup",
+    "scenario": {"description": "Two of the four approved rows already exist in the table.", "preseed_ids": ["t1", "t3"]},
+    "expect": {"added": 2, "total": 4, "skipped": 2, "dlq_count": 0, "log_contains": ["wrote table: 2 new rows", "2 duplicates skipped"]}
+  },
+  {
+    "id": "permanent-failure-to-dlq",
+    "scenario": {"description": "One row is permanently rejected; lands in DLQ, run still succeeds.", "permanent_fail_ids": ["t1"]},
+    "expect": {"added": 3, "total": 3, "skipped": 0, "dlq_count": 1, "log_contains": ["dlq: recorded 1 failed row", "wrote table: 3 new rows", "notify: success notification sent"]}
+  },
+  {
+    "id": "multi-row-dlq",
+    "scenario": {"description": "Two rows permanently fail; both land in DLQ, two good rows still written.", "permanent_fail_ids": ["t1", "t2"]},
+    "expect": {"added": 2, "total": 2, "skipped": 0, "dlq_count": 2, "log_contains": ["dlq: recorded 2 failed row", "wrote table: 2 new rows"]}
+  },
+  {
+    "id": "dry-run",
+    "scenario": {"description": "Dry-run reports what would happen but writes nothing.", "dry_run": true},
+    "expect": {"added": 4, "total": 4, "skipped": 0, "dlq_count": 0, "log_contains": ["[DRY RUN]", "[DRY RUN] wrote table: 4 new rows"], "table_exists": false}
+  },
+  {
+    "id": "dry-run-with-dlq",
+    "scenario": {"description": "Dry-run on a permanent-failure scenario: reports the DLQ row but writes neither file.", "dry_run": true, "permanent_fail_ids": ["t1"]},
+    "expect": {"added": 3, "total": 3, "skipped": 0, "dlq_count": 1, "log_contains": ["[DRY RUN]", "[DRY RUN] dlq: would record 1 failed"], "table_exists": false, "dlq_exists": false}
+  }
+]
