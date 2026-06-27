@@ -1,0 +1,47 @@
+{
+  "_comment": "Documented Power Automate flow definition (simplified). Recreate the steps in the flow designer; this versions the design in git. Mirrors sim/flow.py.",
+  "name": "Scheduled sync — source to Excel table",
+  "trigger": {
+    "type": "Recurrence",
+    "frequency": "Day",
+    "interval": 1,
+    "time": "06:00",
+    "timeZone": "Eastern Standard Time"
+  },
+  "actions": [
+    {
+      "name": "List approved entries",
+      "type": "Connector",
+      "connector": "Asana (or HTTP to Asana API)",
+      "operation": "Get time entries",
+      "filter": "approved eq true"
+    },
+    {
+      "name": "Select & map fields",
+      "type": "Select",
+      "mapFrom": "mapping-config.example.json",
+      "to": ["EntryId", "Employee", "Date", "Project", "Hours", "CostCenter", "Approved"]
+    },
+    {
+      "name": "Upsert rows (idempotent)",
+      "type": "Scope",
+      "wrappedBy": "error-handling.subpattern.yaml",
+      "actions": [
+        {
+          "name": "Add a row into a table",
+          "connector": "Excel Online (Business)",
+          "operation": "Add a row into a table",
+          "table": "TimesheetTable",
+          "dedupeKey": "EntryId",
+          "note": "Check existing rows by EntryId first to avoid duplicates"
+        }
+      ]
+    },
+    {
+      "name": "Notify on success",
+      "type": "Connector",
+      "connector": "Office 365 Outlook",
+      "operation": "Send an email (V2)"
+    }
+  ]
+}

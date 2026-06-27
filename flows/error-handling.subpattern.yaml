@@ -1,0 +1,37 @@
+# Reusable error-handling sub-pattern
+# Wrap any fragile action (a connector write/API call) in this Scope pattern.
+# This is the design the simulator's with_retry() + RunLog implement.
+
+pattern: try_catch_log_notify
+
+try_scope:
+  name: "Try"
+  runAfter: {}
+  contains:
+    - "the fragile action(s) — e.g. write to Excel table, call an API"
+  retryPolicy:
+    type: exponential          # Power Automate per-action setting
+    count: 3
+    interval: PT10S            # 10s, backing off
+
+catch_scope:
+  name: "Catch"
+  runAfter:
+    Try: [Failed, TimedOut]    # only runs if Try failed
+  contains:
+    - name: "Append to run log"
+      action: "Add a row into an Error Log table (SharePoint/Excel)"
+      capture: [flowName, runId, failedStep, errorMessage, timestamp]
+    - name: "Notify on failure"
+      action: "Send an email / Teams message to the owner"
+
+finally_notify:
+  name: "Notify on success"
+  runAfter:
+    Try: [Succeeded]
+  contains:
+    - "Send the success notification"
+
+notes:
+  - "Set the retry policy on the individual action (Settings > Retry Policy)."
+  - "Keep a persistent run-log table so owners can see history (see the handover pack)."

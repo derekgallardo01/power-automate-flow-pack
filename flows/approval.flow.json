@@ -1,0 +1,31 @@
+{
+  "_comment": "Approval gate pattern — route an item for approval, then act on the outcome.",
+  "name": "Approval gate",
+  "trigger": {
+    "type": "When an item is created or modified",
+    "connector": "SharePoint",
+    "list": "Requests"
+  },
+  "actions": [
+    {
+      "name": "Start and wait for an approval",
+      "connector": "Approvals",
+      "operation": "Start and wait for an approval",
+      "approvalType": "Approve/Reject - First to respond",
+      "assignedTo": "@{manager email}"
+    },
+    {
+      "name": "Condition on outcome",
+      "type": "Condition",
+      "if": "outcome == 'Approve'",
+      "then": [
+        {"name": "Update item status", "connector": "SharePoint", "operation": "Update item", "set": {"Status": "Approved"}},
+        {"name": "Continue downstream", "note": "e.g. trigger the scheduled-sync target or write to system of record"}
+      ],
+      "else": [
+        {"name": "Update item status", "connector": "SharePoint", "operation": "Update item", "set": {"Status": "Rejected"}},
+        {"name": "Notify requester", "connector": "Office 365 Outlook", "operation": "Send an email (V2)"}
+      ]
+    }
+  ]
+}

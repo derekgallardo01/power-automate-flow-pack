@@ -1,0 +1,13 @@
+{
+  "key": "EntryId",
+  "only_approved": true,
+  "fields": {
+    "EntryId": "id",
+    "Employee": "user",
+    "Date": "date",
+    "Project": "project",
+    "Hours": "hours",
+    "CostCenter": "cost_center",
+    "Approved": "approved"
+  }
+}

@@ -1,0 +1,7 @@
+[
+  {"id": "t1", "user": "Alex Kim", "date": "2026-06-22", "project": "Onboarding", "hours": 6.5, "cost_center": "CC-100", "approved": true},
+  {"id": "t2", "user": "Alex Kim", "date": "2026-06-23", "project": "Onboarding", "hours": 7.0, "cost_center": "CC-100", "approved": true},
+  {"id": "t3", "user": "Priya Rao", "date": "2026-06-22", "project": "Support", "hours": 8.0, "cost_center": "CC-200", "approved": true},
+  {"id": "t4", "user": "Priya Rao", "date": "2026-06-23", "project": "Support", "hours": 4.0, "cost_center": "CC-200", "approved": false},
+  {"id": "t5", "user": "Sam Cole", "date": "2026-06-23", "project": "Delivery", "hours": 7.5, "cost_center": "CC-300", "approved": true}
+]
