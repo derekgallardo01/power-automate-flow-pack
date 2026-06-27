@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pytest
+        run: pip install --quiet pytest
+      - name: Unit tests
+        run: python -m pytest sim/tests/ -q
+      - name: Eval harness (9 end-to-end scenarios)
+        run: python evals/run.py
+      - name: Smoke-test the demo
+        run: python sim/run.py

@@ -1,5 +1,7 @@
 # Power Automate flow pack
 
+[![CI](https://github.com/derekgallardo01/power-automate-flow-pack/actions/workflows/ci.yml/badge.svg)](https://github.com/derekgallardo01/power-automate-flow-pack/actions/workflows/ci.yml)
+
 Reusable Power Automate patterns for Microsoft 365 automation — pull data on a
 schedule, map fields, write it to an Excel table in SharePoint, with **retry**,
 **de-duplication**, a **dead-letter queue**, **dry-run** mode, and a **run log**
