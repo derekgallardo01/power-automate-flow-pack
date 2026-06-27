@@ -18,7 +18,9 @@ jobs:
         run: pip install --quiet pytest
       - name: Unit tests
         run: python -m pytest sim/tests/ -q
-      - name: Eval harness (9 end-to-end scenarios)
+      - name: Eval harness — Asana time-entries (9 scenarios)
         run: python evals/run.py
+      - name: Eval harness — Microsoft Forms responses (5 scenarios)
+        run: python evals/run.py golden-forms.json sim/data/forms-responses.json sim/data/mapping-config-forms.json
       - name: Smoke-test the demo
         run: python sim/run.py

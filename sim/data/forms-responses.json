@@ -1,0 +1,7 @@
+[
+  {"id": "f1", "submitted_at": "2026-06-22T09:14:00Z", "full_name": "Iris Carter", "email": "iris@example.com", "request_type": "Hardware", "description": "Replacement keyboard - keys stuck", "urgent": false},
+  {"id": "f2", "submitted_at": "2026-06-22T10:42:00Z", "full_name": "Owen Park", "email": "owen@example.com", "request_type": "Access", "description": "Need access to the Marketing SharePoint site", "urgent": false},
+  {"id": "f3", "submitted_at": "2026-06-22T11:08:00Z", "full_name": "Nora Singh", "email": "nora@example.com", "request_type": "Software", "description": "Approval for Figma license renewal", "urgent": false},
+  {"id": "f4", "submitted_at": "2026-06-23T08:33:00Z", "full_name": "Owen Park", "email": "owen@example.com", "request_type": "Access", "description": "Add me to the Marketing SharePoint site too", "urgent": true},
+  {"id": "f5", "submitted_at": "2026-06-23T15:20:00Z", "full_name": "Theo Reyes", "email": "theo@example.com", "request_type": "Hardware", "description": "Second monitor for the new office desk", "urgent": false}
+]

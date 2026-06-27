@@ -1,0 +1,27 @@
+[
+  {
+    "id": "forms-clean-run",
+    "scenario": {"description": "Five form responses arrive, all five land in the table (no approval filter)."},
+    "expect": {"added": 5, "total": 5, "skipped": 0, "dlq_count": 0, "log_contains": ["pull: 5 entries", "wrote table: 5 new rows"]}
+  },
+  {
+    "id": "forms-transient-recovered",
+    "scenario": {"description": "First write fails, retry succeeds.", "fail_writes": 1},
+    "expect": {"added": 5, "total": 5, "skipped": 0, "dlq_count": 0, "log_contains": ["attempt 1 failed", "succeeded on attempt 2"]}
+  },
+  {
+    "id": "forms-idempotent-rerun",
+    "scenario": {"description": "Re-running the same source against a populated table writes nothing new.", "seed_run": true},
+    "expect": {"added": 0, "total": 5, "skipped": 5, "dlq_count": 0, "log_contains": ["wrote table: 0 new rows", "5 duplicates skipped"]}
+  },
+  {
+    "id": "forms-permanent-failure-to-dlq",
+    "scenario": {"description": "One urgent request is permanently rejected; lands in DLQ, run still succeeds.", "permanent_fail_ids": ["f4"]},
+    "expect": {"added": 4, "total": 4, "skipped": 0, "dlq_count": 1, "log_contains": ["dlq: recorded 1 failed row", "notify: success notification sent"]}
+  },
+  {
+    "id": "forms-dry-run",
+    "scenario": {"description": "Dry-run reports what would happen but touches no files.", "dry_run": true},
+    "expect": {"added": 5, "total": 5, "skipped": 0, "dlq_count": 0, "log_contains": ["[DRY RUN]", "[DRY RUN] wrote table: 5 new rows"], "table_exists": false}
+  }
+]

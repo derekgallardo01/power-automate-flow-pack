@@ -73,14 +73,18 @@ Captured run including idempotent re-run, dry-run, and a permanent-failure
 
 ## Evaluation
 
-Nine end-to-end scenarios in [evals/golden.json](evals/golden.json) cover the
-full grid: clean run, transient recovery, multi-retry recovery, idempotent
-re-run, partial dedup, permanent failure → DLQ, multi-row DLQ, dry-run, dry-run
-+ DLQ combined.
+Two scenario sets ship in the repo to prove the pattern works on more than
+one source:
+
+- **Asana time entries** — 9 scenarios in [evals/golden.json](evals/golden.json) against [sim/data/asana_export.json](sim/data/asana_export.json).
+- **Microsoft Forms responses** — 5 scenarios in [evals/golden-forms.json](evals/golden-forms.json) against [sim/data/forms-responses.json](sim/data/forms-responses.json) (different shape, different mapping config, same flow logic).
 
 ```bash
 $ python evals/run.py
-Eval: 9/9 passed (100%)
+Eval (golden.json): 9/9 passed (100%)
+
+$ python evals/run.py golden-forms.json sim/data/forms-responses.json sim/data/mapping-config-forms.json
+Eval (golden-forms.json): 5/5 passed (100%)
 ```
 
 How to add scenarios (real-world failure capture, throughput edges,

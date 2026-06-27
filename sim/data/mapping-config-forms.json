@@ -1,0 +1,13 @@
+{
+  "key": "RequestId",
+  "only_approved": false,
+  "fields": {
+    "RequestId": "id",
+    "SubmittedAt": "submitted_at",
+    "Name": "full_name",
+    "Email": "email",
+    "Type": "request_type",
+    "Description": "description",
+    "Urgent": "urgent"
+  }
+}
