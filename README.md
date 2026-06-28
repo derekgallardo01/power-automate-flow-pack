@@ -41,6 +41,14 @@ docker run --rm power-automate-flow-pack python evals/run.py golden-forms.json s
 docker run --rm power-automate-flow-pack python sim/cli.py --dry-run           # dry-run mode
 ```
 
+## Example: production scenario
+
+**[examples/sync_run_demo.py](examples/sync_run_demo.py)** — Same flow code running across 4 scenarios: happy path / transient failures (retry succeeds) / permanent failure (DLQ catches it) / dry-run
+
+```bash
+python examples/sync_run_demo.py
+```
+
 ## The problem it solves
 
 A team had approved time entries in Asana but payroll needed them in an Excel
