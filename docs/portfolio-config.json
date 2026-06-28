@@ -1,0 +1,24 @@
+{
+  "repo": "power-automate-flow-pack",
+  "title": "Power Automate Flow Pack",
+  "tagline": "Scheduled M365 sync with retry, idempotent dedupe, dead-letter queue, and dry-run mode.",
+  "kicker": "Microsoft 365 \u00b7 Automation \u00b7 Capability Demo",
+  "features": [
+    {
+      "label": "Patterns",
+      "value": "DLQ + dry-run + retry"
+    },
+    {
+      "label": "Eval cases",
+      "value": "14 end-to-end scenarios"
+    },
+    {
+      "label": "Sources",
+      "value": "Asana + Microsoft Forms"
+    }
+  ],
+  "theme": {
+    "primary": "#0078d4",
+    "accent": "#50a4d9"
+  }
+}
