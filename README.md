@@ -22,6 +22,16 @@ python -m pytest sim/tests/ -q             # 10 unit tests
 
 Stdlib-only Python, no tenant required to run any of this.
 
+## Run in Docker
+
+```bash
+docker build -t power-automate-flow-pack .
+docker run --rm power-automate-flow-pack                                       # scripted demo
+docker run --rm power-automate-flow-pack python evals/run.py                   # Asana scenarios
+docker run --rm power-automate-flow-pack python evals/run.py golden-forms.json sim/data/forms-responses.json sim/data/mapping-config-forms.json   # Forms scenarios
+docker run --rm power-automate-flow-pack python sim/cli.py --dry-run           # dry-run mode
+```
+
 ## The problem it solves
 
 A team had approved time entries in Asana but payroll needed them in an Excel
