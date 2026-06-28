@@ -1,6 +1,6 @@
 # Power Automate flow pack
 
-[![CI](https://github.com/derekgallardo01/power-automate-flow-pack/actions/workflows/ci.yml/badge.svg)](https://github.com/derekgallardo01/power-automate-flow-pack/actions/workflows/ci.yml)
+[![CI](https://github.com/derekgallardo01/power-automate-flow-pack/actions/workflows/ci.yml/badge.svg)](https://github.com/derekgallardo01/power-automate-flow-pack/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](#)
 
 **Live demo:** [derekgallardo01.github.io/power-automate-flow-pack](https://derekgallardo01.github.io/power-automate-flow-pack/) — six scenarios run end-to-end (normal run with retry, idempotent re-run, dry-run, DLQ, plus the same patterns against a Microsoft Forms source), regenerated on every push.
 

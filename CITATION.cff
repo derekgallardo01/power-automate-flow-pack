@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use or reference this kit, please cite it as below."
+title: "Power Automate flow pack"
+authors:
+  - family-names: "Gallardo"
+    given-names: "Derek"
+repository-code: "https://github.com/derekgallardo01/power-automate-flow-pack"
+url: "https://github.com/derekgallardo01/power-automate-flow-pack"
+license: MIT
+version: "1.0.0"
+date-released: "2026-06-27"
+keywords:
+  - microsoft-365
+  - capability-demo
