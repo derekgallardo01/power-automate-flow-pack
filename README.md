@@ -4,6 +4,11 @@
 
 **Live demo:** [derekgallardo01.github.io/power-automate-flow-pack](https://derekgallardo01.github.io/power-automate-flow-pack/) — six scenarios run end-to-end (normal run with retry, idempotent re-run, dry-run, DLQ, plus the same patterns against a Microsoft Forms source), regenerated on every push.
 
+[![Live demo preview](docs/screenshots/02-hero.png)](https://derekgallardo01.github.io/power-automate-flow-pack/)
+
+[Full-page capture (all 6 scenarios) →](docs/screenshots/01-overview-fullpage.png)
+
+
 Reusable Power Automate patterns for Microsoft 365 automation — pull data on a
 schedule, map fields, write it to an Excel table in SharePoint, with **retry**,
 **de-duplication**, a **dead-letter queue**, **dry-run** mode, and a **run log**
