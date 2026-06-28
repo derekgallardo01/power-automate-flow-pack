@@ -1,0 +1,126 @@
+name: Deploy live demo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate the static demo report
+        run: |
+          mkdir -p site
+          python - <<'PY'
+          import html
+          import json
+          import os
+          import sys
+          import tempfile
+          sys.path.insert(0, "sim")
+          from flow import run_sync
+
+          ASANA_SRC = "sim/data/asana_export.json"
+          ASANA_MAP = "sim/data/mapping-config.json"
+          FORMS_SRC = "sim/data/forms-responses.json"
+          FORMS_MAP = "sim/data/mapping-config-forms.json"
+
+          SCENARIOS = [
+              ("Asana time entries - normal run with a transient failure recovered",
+               ASANA_SRC, ASANA_MAP, dict(fail_writes=1)),
+              ("Asana time entries - idempotent re-run (table already populated)",
+               ASANA_SRC, ASANA_MAP, dict(fail_writes=0, seed=True)),
+              ("Asana time entries - dry-run (no files touched)",
+               ASANA_SRC, ASANA_MAP, dict(fail_writes=0, dry_run=True)),
+              ("Asana time entries - permanent failure goes to DLQ, run still succeeds",
+               ASANA_SRC, ASANA_MAP, dict(fail_writes=0, permanent_fail_ids=["t1"])),
+              ("Microsoft Forms - clean run (no approval filter)",
+               FORMS_SRC, FORMS_MAP, dict(fail_writes=0)),
+              ("Microsoft Forms - dry-run with a permanent failure",
+               FORMS_SRC, FORMS_MAP, dict(fail_writes=0, dry_run=True, permanent_fail_ids=["f4"])),
+          ]
+
+          def render_scenario(label, src, mapping, opts):
+              tmp = tempfile.mkdtemp()
+              table = os.path.join(tmp, "excel_table.json")
+              dlq = os.path.join(tmp, "dlq.json")
+              if opts.pop("seed", False):
+                  run_sync(src, mapping, table, fail_writes=0, dlq_path=dlq)
+              log, result = run_sync(src, mapping, table, dlq_path=dlq, **opts)
+              log_lines = str(log)
+              dlq_rows = []
+              if os.path.exists(dlq):
+                  with open(dlq, encoding="utf-8") as fh:
+                      dlq_rows = json.load(fh)
+              parts = [f'<h2>{html.escape(label)}</h2>']
+              parts.append('<div class="cards">'
+                  f'<div class="card"><div class="k">added</div><div class="v">{result["added"]}</div></div>'
+                  f'<div class="card"><div class="k">total</div><div class="v">{result["total"]}</div></div>'
+                  f'<div class="card"><div class="k">skipped</div><div class="v">{result["skipped"]}</div></div>'
+                  f'<div class="card"><div class="k">DLQ</div><div class="v">{result["dlq_count"]}</div></div>'
+                  '</div>')
+              parts.append('<h3>Run log</h3>')
+              parts.append(f'<pre class="log">{html.escape(log_lines)}</pre>')
+              if dlq_rows:
+                  parts.append('<h3>DLQ rows</h3>')
+                  parts.append(f'<pre class="log">{html.escape(json.dumps(dlq_rows, indent=2))}</pre>')
+              return ''.join(parts)
+
+          page = f"""<!DOCTYPE html>
+          <html lang="en"><head><meta charset="utf-8">
+          <title>Power Automate flow pack - live demo</title>
+          <style>
+            body{{font-family:Segoe UI,Arial,sans-serif;max-width:880px;margin:2.5rem auto;padding:0 1.5rem;color:#222;background:#f3f4f6}}
+            h1{{font-size:1.5rem;margin-bottom:.25rem}}
+            h2{{font-size:1.1rem;border-left:4px solid #2b6cb0;padding-left:10px;margin-top:2rem}}
+            h3{{font-size:.95rem;margin-top:1rem;margin-bottom:.35rem;color:#374151}}
+            .lead{{color:#555;font-size:.95rem;margin-top:.25rem}}
+            .meta{{color:#888;font-size:.85rem}}
+            a{{color:#2b6cb0}}
+            code{{background:#eef0f3;padding:1px 6px;border-radius:4px;font-size:.9em}}
+            .cards{{display:flex;gap:.6rem;flex-wrap:wrap;margin:.65rem 0}}
+            .card{{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:.55rem .9rem;min-width:90px;flex:1;text-align:center}}
+            .card .k{{color:#666;font-size:.8rem}}
+            .card .v{{font-size:1.3rem;font-weight:600;margin-top:.15rem}}
+            .log{{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:.7rem .9rem;
+                  font-family:Consolas,Menlo,monospace;font-size:.85em;line-height:1.5;color:#222;margin:.4rem 0;overflow-x:auto;white-space:pre-wrap}}
+          </style>
+          </head><body>
+          <h1>Power Automate flow pack - live demo</h1>
+          <p class="lead">Six scenarios run end-to-end through the simulator: normal run with retry, idempotent re-run, dry-run, permanent failure to DLQ, and the same patterns against a Microsoft Forms source. Regenerated on every push.</p>
+
+          {''.join(render_scenario(*s) for s in SCENARIOS)}
+
+          <p class="meta" style="margin-top:2.5rem">Generated on every push by the simulator.
+          Source: <a href="https://github.com/derekgallardo01/power-automate-flow-pack">github.com/derekgallardo01/power-automate-flow-pack</a></p>
+          </body></html>
+          """
+          with open("site/index.html", "w", encoding="utf-8") as fh:
+              fh.write(page)
+          print("wrote site/index.html")
+          PY
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
